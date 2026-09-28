@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Come Home</title>
+<meta name="description" content="COME HOME — a first-person psychological horror game for the browser. Headphones. Lights off.">
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="view" tabindex="-1"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="crosshair"></div>
+    <div id="prompt"><span class="key">E</span><span class="label"></span></div>
+    <div id="objective"><div class="obj-label">Objective</div><div class="obj-text"></div></div>
+    <div id="subtitles"></div>
+    <div id="toast"></div>
+    <div id="stamina"><div class="fill"></div></div>
+    <div id="hint"></div>
+  </div>
+
+  <div id="chapter-card"><div class="num"></div><div class="name"></div></div>
+  <div id="cinematic"></div>
+
+  <div id="note" class="overlay hidden">
+    <div class="paper"><div class="note-title"></div><div class="note-img"></div><div class="note-body"></div></div>
+    <div class="overlay-hint">E / Esc / click to put it down</div>
+  </div>
+
+  <div id="journal" class="overlay hidden">
+    <div class="journal-inner">
+      <h2>Journal</h2>
+      <div class="j-section"><div class="j-label">Right now</div><div id="j-objective"></div></div>
+      <div class="j-section"><div class="j-label">Things I've found</div><ul id="j-notes"></ul></div>
+      <div class="overlay-hint">J / Esc to close</div>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="menu">
+      <h2>Paused</h2>
+      <button data-act="resume">Resume</button>
+      <button data-act="settings">Settings</button>
+      <button data-act="controls">Controls</button>
+      <button data-act="restart">Restart chapter</button>
+      <button data-act="quit">Quit to title</button>
+    </div>
+  </div>
+
+  <div id="settings" class="overlay hidden">
+    <div class="menu wide">
+      <h2>Settings</h2>
+      <label class="row">Mouse sensitivity <input type="range" id="set-sens" min="0.2" max="3" step="0.05"></label>
+      <label class="row">Volume <input type="range" id="set-vol" min="0" max="1" step="0.01"></label>
+      <label class="row">Brightness <input type="range" id="set-bright" min="0" max="1" step="0.01"></label>
+      <label class="row">Invert mouse Y <input type="checkbox" id="set-invert"></label>
+      <label class="row">Retro pixels <input type="checkbox" id="set-retro"></label>
+      <label class="row">Quality
+        <select id="set-quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+      </label>
+      <div class="bright-test"><span style="opacity:.06">barely</span> <span style="opacity:.14">visible</span></div>
+      <button data-act="back">Back</button>
+    </div>
+  </div>
+
+  <div id="controls" class="overlay hidden">
+    <div class="menu wide">
+      <h2>Controls</h2>
+      <table class="keys">
+        <tr><td>W A S D</td><td>Walk</td></tr>
+        <tr><td>Mouse</td><td>Look</td></tr>
+        <tr><td>Shift</td><td>Run (you tire quickly)</td></tr>
+        <tr><td>E / Left click</td><td>Interact</td></tr>
+        <tr><td>F</td><td>Flashlight</td></tr>
+        <tr><td>J</td><td>Journal — the Rules, notes, what to do</td></tr>
+        <tr><td>Esc</td><td>Pause</td></tr>
+      </table>
+      <p class="small">If the mouse can't be captured, hold the left button and drag to look, or turn with the arrow keys.</p>
+      <button data-act="back">Back</button>
+    </div>
+  </div>
+
+  <div id="title" class="overlay hidden">
+    <div class="title-inner">
+      <h1 class="game-title">Come Home</h1>
+      <div class="tagline">Mom died nineteen days ago. Last night, she called.</div>
+      <div class="menu">
+        <button data-act="begin">Begin</button>
+        <button data-act="continue" class="hidden">Continue</button>
+        <button data-act="settings">Settings</button>
+        <button data-act="controls">Controls</button>
+      </div>
+    </div>
+    <div class="footer">Headphones strongly recommended &middot; Play in the dark &middot; Contains sudden loud sounds, flashing lights and disturbing imagery</div>
+  </div>
+
+  <div id="gate" class="overlay">
+    <div class="gate-inner">
+      <div class="gate-title">Come Home</div>
+      <div class="gate-sub">a horror story in seven rules</div>
+      <div class="gate-bar"><div class="gate-fill"></div></div>
+      <div class="gate-status">building the house…</div>
+      <ul class="gate-warn">
+        <li>Put on headphones.</li>
+        <li>Turn off the lights.</li>
+        <li>This game contains loud jump scares, flashing images and themes of grief and the death of a child.</li>
+      </ul>
+      <div class="gate-go hidden">click to go home</div>
+    </div>
+  </div>
+
+  <div id="death" class="overlay hidden"><div class="msg"></div><div class="sub"></div></div>
+  <div id="credits" class="overlay hidden"><div class="credits-inner"></div></div>
+  <div id="error" class="overlay hidden"><div class="err-inner"></div></div>
+</div>
+<script>/*__JS__*/</script>
+</body>
+</html>

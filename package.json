@@ -1,0 +1,17 @@
+{
+  "name": "come-home",
+  "version": "1.0.0",
+  "private": true,
+  "description": "COME HOME — a first-person 3D psychological horror game that runs in the browser.",
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "watch": "node tools/build.mjs --watch",
+    "serve": "npx http-server . -p 8080 -c-1",
+    "test": "node tests/playthrough.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "three": "^0.186.1"
+  }
+}
