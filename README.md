@@ -70,14 +70,22 @@ Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/`
 
 One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**. After the first run the game lives at `https://<owner>.github.io/<repo>/` (the finished URL is also shown on the workflow run). Opening that link on an iPad is the easiest way to play it with the touch controls.
 
-### Automated playthrough
+### Automated tests
 
-`tests/playthrough.mjs` plays the entire game headlessly: an autopilot walks the real player controller through every route, aims at every object and presses E — including dying once in chapter IV and deliberately breaking Rules 3 and 4 before obeying them — and writes screenshots to `test-output/`.
+Two Playwright suites run the built game in headless Chromium and write screenshots to `test-output/`.
+
+`tests/playthrough.mjs` plays the entire game headlessly: an autopilot walks the real player controller through every route, aims at every object and presses E — including dying once in chapter IV and deliberately breaking Rules 3 and 4 before obeying them.
+
+`tests/touch.mjs` drives the game as an iPad with real multi-touch events (both sticks, the run ring, every button, the Settings switch, notes, portrait) and then as a desktop, to prove the keyboard controls still behave.
 
 ```bash
-npm i -D playwright && npx playwright install chromium
-npm run build && npm test
+npm install && npx playwright install chromium   # once
+npm run build
+npm test               # full playthrough, about 3 minutes
+npm run test:touch     # touch controls + keyboard regression
 ```
+
+`.github/workflows/test.yml` runs both suites, in parallel, on every pull request and every push to `main`. If one fails, its screenshots are attached to the workflow run.
 
 Append `?chapter=hunt` (or `arrival`, `rules`, `hallway`, `well`, `after`) to the URL to jump to a chapter while developing.
 

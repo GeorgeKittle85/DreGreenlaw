@@ -1,0 +1,62 @@
+# Runs the Playwright suites against a fresh build of the game, in headless Chromium.
+#
+#   Full playthrough   tests/playthrough.mjs   autopilot plays all five chapters and the epilogue
+#   Touch controls     tests/touch.mjs         emulated iPad with real multi-touch, plus keyboard regression
+#
+# They run in parallel (one runner each). When one fails, its screenshots are attached to the run.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# a newer push to the same branch makes the older run pointless
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false # a red playthrough shouldn't hide whether the touch suite passes
+      matrix:
+        include:
+          - name: Full playthrough
+            script: test
+          - name: Touch controls
+            script: test:touch
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # the tests load the built single-file game, so build it from src/ first
+      - run: npm run build
+
+      # the Playwright version is pinned by package-lock.json; this fetches the matching Chromium
+      # plus the system libraries it needs on a bare runner
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run ${{ matrix.script }}
+
+      - name: Keep the screenshots from a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.script }}
+          path: test-output/
+          if-no-files-found: ignore
+          retention-days: 7

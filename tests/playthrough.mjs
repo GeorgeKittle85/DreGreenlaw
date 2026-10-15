@@ -1,6 +1,6 @@
 // End-to-end playthrough of COME HOME in headless Chromium.
 //
-//   npm run build && npm test          (needs Playwright + Chromium: npm i -D playwright && npx playwright install chromium)
+//   npm run build && npm test          (needs Playwright + Chromium: npm install && npx playwright install chromium)
 //
 // The real player controller walks every route (autopilot over the collision
 // world), aims at every object and presses E, so a pass means the whole game
@@ -25,7 +25,7 @@ for (const base of [root + '/', '/opt/node22/lib/node_modules/']) {
   }
 }
 if (!chromium) {
-  console.error('Playwright not found. Run: npm i -D playwright && npx playwright install chromium');
+  console.error('Playwright not found. Run: npm install && npx playwright install chromium');
   process.exit(2);
 }
 

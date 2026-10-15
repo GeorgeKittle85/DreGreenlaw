@@ -1,6 +1,6 @@
 // Touch-controls test for COME HOME in headless Chromium.
 //
-//   npm run build && npm run test:touch   (needs Playwright + Chromium: npm i -D playwright && npx playwright install chromium)
+//   npm run build && npm run test:touch   (needs Playwright + Chromium: npm install && npx playwright install chromium)
 //
 // First as an iPad (touch emulation, real multi-touch events over the DevTools protocol): both sticks,
 // run ring, dead zone, USE / LIGHT / JOURNAL / PAUSE, the Settings switch, notes, and the layout
@@ -24,7 +24,7 @@ for (const base of [root + '/', '/opt/node22/lib/node_modules/']) {
   }
 }
 if (!chromium) {
-  console.error('Playwright not found. Run: npm i -D playwright && npx playwright install chromium');
+  console.error('Playwright not found. Run: npm install && npx playwright install chromium');
   process.exit(2);
 }
 
