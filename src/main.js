@@ -6,18 +6,18 @@ async function boot() {
   const ui = new UI();
   const canvas = document.getElementById('view');
   const params = new URLSearchParams(location.search);
-  if (window.matchMedia?.('(pointer: coarse)').matches && !window.matchMedia('(pointer: fine)').matches) {
-    const li = document.createElement('li');
-    li.textContent = 'This game needs a keyboard and mouse. It will not play well on a phone or tablet.';
-    li.style.color = '#c9a86a';
-    document.querySelector('.gate-warn')?.prepend(li);
-  }
   let game;
   try {
     const probe = document.createElement('canvas').getContext('webgl2');
     if (!probe) throw new Error('WebGL2 unavailable');
     game = new Game(canvas, ui);
     window.__boot = { game };
+    if (game.settings.controls === 'touch') {
+      const li = document.createElement('li');
+      li.textContent = 'Touch controls are on: two on-screen joysticks. Prefer a keyboard and mouse? Switch in Settings.';
+      li.style.color = '#c9a86a';
+      document.querySelector('.gate-warn')?.prepend(li);
+    }
     await game.init((f, t) => ui.gateProgress(f, t));
   } catch (e) {
     console.error(e);

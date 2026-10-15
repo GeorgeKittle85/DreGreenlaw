@@ -13,7 +13,9 @@ You drive back to 57 Hollow Creek Road, the house you were sent away from twenty
 
 ## Play
 
-Open **`index.html`** in a recent desktop Chrome, Edge, Firefox or Safari. That's it — the whole game (engine, textures, sounds, fonts) is one self-contained file with no network access needed. Every texture is painted procedurally and every sound is synthesised at load time; there are no image or audio files.
+Open **`index.html`** in a recent Chrome, Edge, Firefox or Safari — on a desktop, or on a tablet such as an iPad. That's it — the whole game (engine, textures, sounds, fonts) is one self-contained file with no network access needed. Every texture is painted procedurally and every sound is synthesised at load time; there are no image or audio files.
+
+### Keyboard and mouse
 
 | Key | Action |
 | --- | --- |
@@ -25,7 +27,22 @@ Open **`index.html`** in a recent desktop Chrome, Edge, Firefox or Safari. That'
 | J | Journal (the Rules, notes, current objective) |
 | Esc | Pause / settings |
 
-Settings include mouse sensitivity, volume, brightness, a retro-pixel toggle and three quality levels. Progress is saved per chapter (Continue on the title screen).
+### Touch joysticks (iPad, tablets, phones)
+
+Two on-screen sticks, played landscape:
+
+| Control | Action |
+| --- | --- |
+| Left stick | Walk — a light push is a slow walk. Drag past the dashed outer ring to run (you tire quickly) |
+| Right stick | Look |
+| USE | Interact |
+| LIGHT | Flashlight |
+| JOURNAL | Journal (the Rules, notes, current objective) |
+| PAUSE | Pause / settings |
+
+The game picks touch controls by itself on devices whose main input is a finger. Either way you can switch at any time under **Settings → Controls** (from the title screen or the pause menu); the choice is remembered. Add the page to your iPad's Home Screen to hide the browser bars.
+
+Settings include the control scheme, look sensitivity, volume, brightness, a retro-pixel toggle and three quality levels. Progress is saved per chapter (Continue on the title screen).
 
 A first playthrough takes roughly 20–30 minutes. The test autopilot, which knows where everything is, finishes in about 8.
 
@@ -45,7 +62,7 @@ npm run build      # bundles src/ into the single-file index.html
 npm run watch      # rebuild on change
 ```
 
-Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/` (the house, yard, loop, basement), `audio/` (synth + mixer), `game/` (player, creature, story, chapters), `ui/`.
+Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/` (the house, yard, loop, basement), `audio/` (synth + mixer), `game/` (player, creature, story, chapters), `ui/` (menus and HUD; `touch.js` is the on-screen joystick layer, which writes into `Input.touch`).
 
 ### Automated playthrough
 

@@ -1,3 +1,5 @@
+import { TouchControls } from './touch.js';
+
 const $ = (sel) => document.querySelector(sel);
 
 /** All DOM overlays. Timed things (subtitles, objective fade) advance with game time via update(dt). */
@@ -6,7 +8,10 @@ export class UI {
     this.app = $('#app');
     this.hudEl = $('#hud');
     this.promptEl = $('#prompt');
+    this.promptKey = $('#prompt .key');
     this.promptLabel = $('#prompt .label');
+    this.touch = new TouchControls($('#touch'));
+    this.touchMode = false;
     this.crossEl = $('#crosshair');
     this.objEl = $('#objective');
     this.objText = $('#objective .obj-text');
@@ -33,6 +38,7 @@ export class UI {
     this.hintTimer = 0;
     this.objective = '';
     this.noteResolve = null;
+    this.noteShownAt = 0;
     this.onAction = () => {};
     this.menuReturn = null;
 
@@ -44,8 +50,25 @@ export class UI {
     }
     this.noteEl.addEventListener('mousedown', (e) => {
       e.stopPropagation();
+      // the tap that opened a note can send an emulated mouse press a moment later; don't let it close it
+      if (performance.now() - this.noteShownAt < 350) return;
       this.closeNote();
     });
+  }
+
+  /** Switch the on-screen wording and layout between keyboard + mouse and touch joysticks. */
+  setTouchMode(on) {
+    this.touchMode = on;
+    this.app.classList.toggle('touch', on);
+    this.promptKey.textContent = on ? 'USE' : 'E';
+    $('.gate-go').textContent = on ? 'tap to go home' : 'click to go home';
+  }
+
+  /** The "how do I play" line shown at the start of the first chapter. */
+  controlsHint() {
+    return this.touchMode
+      ? 'Left stick: walk (drag past the ring to run) · Right stick: look · USE to interact · LIGHT for the flashlight · JOURNAL for your notes'
+      : 'WASD to walk · Mouse to look · E to interact · F for the flashlight · J for your journal';
   }
 
   // ------------------------------------------------------------ gate / loading
@@ -189,6 +212,7 @@ export class UI {
     this.noteEl.querySelector('.note-body').innerHTML = note.body || '';
     paper.scrollTop = 0;
     this.noteEl.classList.remove('hidden');
+    this.noteShownAt = performance.now();
     return new Promise((res) => {
       this.noteResolve = res;
     });
@@ -273,6 +297,7 @@ export class UI {
         onChange(key);
       });
     };
+    bind('set-controls', 'controls', (v) => v);
     bind('set-sens', 'sensitivity');
     bind('set-vol', 'volume');
     bind('set-bright', 'brightness');
