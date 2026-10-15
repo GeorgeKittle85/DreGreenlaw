@@ -64,6 +64,12 @@ npm run watch      # rebuild on change
 
 Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/` (the house, yard, loop, basement), `audio/` (synth + mixer), `game/` (player, creature, story, chapters), `ui/` (menus and HUD; `touch.js` is the on-screen joystick layer, which writes into `Input.touch`).
 
+### Deploying to GitHub Pages
+
+`.github/workflows/deploy.yml` builds the game and publishes it to GitHub Pages on every push to `main`, or on demand from the **Actions** tab. Pull requests only run the build, so a broken build is caught before it merges. The site is built from `src/` in CI, so the deployed game never depends on the committed `index.html` being up to date.
+
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**. After the first run the game lives at `https://<owner>.github.io/<repo>/` (the finished URL is also shown on the workflow run). Opening that link on an iPad is the easiest way to play it with the touch controls.
+
 ### Automated playthrough
 
 `tests/playthrough.mjs` plays the entire game headlessly: an autopilot walks the real player controller through every route, aims at every object and presses E — including dying once in chapter IV and deliberately breaking Rules 3 and 4 before obeying them — and writes screenshots to `test-output/`.
