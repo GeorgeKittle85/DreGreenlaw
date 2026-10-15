@@ -184,6 +184,13 @@ export class Story {
       else if (act === 'settings' || act === 'controls') ui.openSub(act, from === 'title' ? 'title' : 'pause');
       else if (act === 'back') ui.closeSub();
       else if (act === 'resume') this.resume();
+      // the touch layout's stand-ins for Esc and J
+      else if (act === 'pause') {
+        if (g.mode === 'play' || g.mode === 'cine') this.pause();
+      } else if (act === 'journal') {
+        if (g.ui.journalOpen) this.closeJournal();
+        else if (g.mode === 'play') this.openJournal();
+      } else if (act === 'closejournal') this.closeJournal();
       else if (act === 'restart') {
         ui.show(ui.pauseEl, false);
         this.startChapter(this.chapterId, { fromSave: true });

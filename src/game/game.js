@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Renderer } from '../engine/renderer.js';
-import { Input } from '../engine/input.js';
+import { Input, prefersTouch } from '../engine/input.js';
 import { Physics } from '../engine/physics.js';
 import { createMaterials } from '../engine/materials.js';
 import { Audio } from '../audio/audio.js';
@@ -36,9 +36,12 @@ export class Game {
     this.scene.add(this.camera);
     this.physics = new Physics();
     this.input = new Input(canvas);
+    ui.touch.bind(this.input);
     this.audio = new Audio();
     this.sched = new Scheduler();
-    this.settings = { ...DEFAULT_SETTINGS, ...loadJSON('comehome.settings') };
+    // controls: 'keyboard' (keyboard + mouse) or 'touch' (on-screen joysticks). Until the player
+    // picks one in Settings, tablets and phones start on 'touch' and everything else on 'keyboard'.
+    this.settings = { ...DEFAULT_SETTINGS, controls: prefersTouch() ? 'touch' : 'keyboard', ...loadJSON('comehome.settings') };
     this.mode = 'loading';
     this.running = false;
     this.time = 0;
@@ -111,6 +114,9 @@ export class Game {
     this.renderer.resize(this.camera);
     this.renderer.uniforms.uBrightness.value = s.brightness;
     this.audio.setVolume(s.volume);
+    const touch = s.controls === 'touch';
+    this.input.setTouchMode(touch);
+    this.ui.setTouchMode(touch);
     const size = this.renderer.shadowSize;
     const sh = this.flashlight?.spot.shadow;
     if (sh && sh.mapSize.x !== size) {
@@ -179,6 +185,8 @@ export class Game {
   step(dt) {
     if (this.running) this.tick(dt);
     else if (this.mode === 'title') this.tickTitle(dt);
+    // the joysticks belong to the running game; every menu, note and cutscene card hides them
+    this.ui.touch.setActive(this.running && this.input.touchMode);
     this.input.endFrame();
     // rendering normally refreshes world matrices; headless stepping must do it itself
     if (this.debug.noRender) this.scene.updateMatrixWorld();

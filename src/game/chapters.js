@@ -243,7 +243,7 @@ export const CHAPTERS = {
       await st.line(s, "Twenty years. It hasn't changed at all.");
       st.say('The flag on the mailbox is up.', 'inner');
       st.objective('Check the mailbox.');
-      g.ui.hint('WASD to walk · Mouse to look · E to interact · F for the flashlight · J for your journal', 9);
+      g.ui.hint(g.ui.controlsHint(), 9);
 
       // the light in Ellie's window
       s.spawn(async (s2) => {

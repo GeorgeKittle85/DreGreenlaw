@@ -8,10 +8,12 @@
     "build": "node tools/build.mjs",
     "watch": "node tools/build.mjs --watch",
     "serve": "npx http-server . -p 8080 -c-1",
-    "test": "node tests/playthrough.mjs"
+    "test": "node tests/playthrough.mjs",
+    "test:touch": "node tests/touch.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
+    "playwright": "^1.56.1",
     "three": "^0.186.1"
   }
 }

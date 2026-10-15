@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Come Home</title>
 <meta name="description" content="COME HOME — a first-person psychological horror game for the browser. Headphones. Lights off.">
 <style>/*__CSS__*/</style>
@@ -25,9 +28,30 @@
   <div id="chapter-card"><div class="num"></div><div class="name"></div></div>
   <div id="cinematic"></div>
 
+  <!-- On-screen controls for touch devices; shown only while a touch-mode game is running. -->
+  <div id="touch" class="hidden">
+    <div class="stick left" id="stick-move">
+      <div class="ring"></div>
+      <span class="cap top">run</span>
+      <div class="base"><div class="knob"></div></div>
+      <span class="cap bottom">walk</span>
+    </div>
+    <div class="stick right" id="stick-look">
+      <div class="base"><div class="knob"></div></div>
+      <span class="cap bottom">look</span>
+    </div>
+    <button class="tbtn tb-light" id="tb-light" tabindex="-1">LIGHT</button>
+    <button class="tbtn tb-use" id="tb-use" tabindex="-1">USE</button>
+    <div class="tb-top">
+      <button class="tbtn mini" data-act="journal" tabindex="-1">JOURNAL</button>
+      <button class="tbtn mini" data-act="pause" tabindex="-1">PAUSE</button>
+    </div>
+  </div>
+  <div id="rotate">Turn your device sideways</div>
+
   <div id="note" class="overlay hidden">
     <div class="paper"><div class="note-title"></div><div class="note-img"></div><div class="note-body"></div></div>
-    <div class="overlay-hint">E / Esc / click to put it down</div>
+    <div class="overlay-hint"><span class="kb-only">E / Esc / click to put it down</span><span class="touch-only">Tap to put it down</span></div>
   </div>
 
   <div id="journal" class="overlay hidden">
@@ -35,7 +59,8 @@
       <h2>Journal</h2>
       <div class="j-section"><div class="j-label">Right now</div><div id="j-objective"></div></div>
       <div class="j-section"><div class="j-label">Things I've found</div><ul id="j-notes"></ul></div>
-      <div class="overlay-hint">J / Esc to close</div>
+      <div class="menu touch-only"><button data-act="closejournal">Close</button></div>
+      <div class="overlay-hint kb-only">J / Esc to close</div>
     </div>
   </div>
 
@@ -53,10 +78,13 @@
   <div id="settings" class="overlay hidden">
     <div class="menu wide">
       <h2>Settings</h2>
-      <label class="row">Mouse sensitivity <input type="range" id="set-sens" min="0.2" max="3" step="0.05"></label>
+      <label class="row">Controls
+        <select id="set-controls"><option value="keyboard">Keyboard &amp; mouse</option><option value="touch">Touch joysticks</option></select>
+      </label>
+      <label class="row">Look sensitivity <input type="range" id="set-sens" min="0.2" max="3" step="0.05"></label>
       <label class="row">Volume <input type="range" id="set-vol" min="0" max="1" step="0.01"></label>
       <label class="row">Brightness <input type="range" id="set-bright" min="0" max="1" step="0.01"></label>
-      <label class="row">Invert mouse Y <input type="checkbox" id="set-invert"></label>
+      <label class="row">Invert look Y <input type="checkbox" id="set-invert"></label>
       <label class="row">Retro pixels <input type="checkbox" id="set-retro"></label>
       <label class="row">Quality
         <select id="set-quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
@@ -69,7 +97,7 @@
   <div id="controls" class="overlay hidden">
     <div class="menu wide">
       <h2>Controls</h2>
-      <table class="keys">
+      <table class="keys kb-only">
         <tr><td>W A S D</td><td>Walk</td></tr>
         <tr><td>Mouse</td><td>Look</td></tr>
         <tr><td>Shift</td><td>Run (you tire quickly)</td></tr>
@@ -78,7 +106,16 @@
         <tr><td>J</td><td>Journal — the Rules, notes, what to do</td></tr>
         <tr><td>Esc</td><td>Pause</td></tr>
       </table>
-      <p class="small">If the mouse can't be captured, hold the left button and drag to look, or turn with the arrow keys.</p>
+      <p class="small kb-only">If the mouse can't be captured, hold the left button and drag to look, or turn with the arrow keys.</p>
+      <table class="keys touch-only">
+        <tr><td>Left stick</td><td>Walk. Drag past the dashed ring to run (you tire quickly)</td></tr>
+        <tr><td>Right stick</td><td>Look</td></tr>
+        <tr><td>USE</td><td>Interact</td></tr>
+        <tr><td>LIGHT</td><td>Flashlight</td></tr>
+        <tr><td>JOURNAL</td><td>The Rules, notes, what to do</td></tr>
+        <tr><td>PAUSE</td><td>Pause</td></tr>
+      </table>
+      <p class="small">Switch between keyboard &amp; mouse and touch joysticks in Settings.</p>
       <button data-act="back">Back</button>
     </div>
   </div>

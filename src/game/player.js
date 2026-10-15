@@ -76,6 +76,12 @@ export class Player {
       this.yaw -= input.mdx * sens;
       this.pitch -= input.mdy * sens * (s.invertY ? -1 : 1);
       this.yaw -= input.turnAxis() * 2.2 * dt;
+      // right stick: a rate, in radians per second at full tilt (looking up/down is slower)
+      const stick = input.lookAxis();
+      if (stick.x || stick.y) {
+        this.yaw -= stick.x * 2.8 * s.sensitivity * dt;
+        this.pitch -= stick.y * 1.8 * s.sensitivity * dt * (s.invertY ? -1 : 1);
+      }
     }
     if (this.lookAt) {
       const eye = this.camera.position;

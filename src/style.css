@@ -22,14 +22,24 @@
 :root[data-theme="dark"] { --bg: #000; }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; overscroll-behavior: none; }
 body { font-family: 'Elite', 'Courier New', monospace; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
-#app { position: fixed; inset: 0; overflow: hidden; background: #000; cursor: default; }
+#app {
+  position: fixed; inset: 0; overflow: hidden; background: #000; cursor: default;
+  /* a finger on the game must never scroll, zoom, select text or pop up a callout */
+  touch-action: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+  /* on-screen control sizes (see "Touch controls" below) */
+  --base: clamp(110px, 21vmin, 168px); --zone: calc(var(--base) * 1.5); --btn: calc(var(--base) * 0.5);
+  --sl: env(safe-area-inset-left, 0px); --sr: env(safe-area-inset-right, 0px);
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+}
 #app.playing { cursor: none; }
 #view { position: absolute; left: 0; top: 0; display: block; background: #000; outline: none; transform-origin: 0 0; }
 #view.retro { image-rendering: pixelated; }
 
 .hidden { display: none !important; }
+/* wording that only makes sense for one control scheme */
+#app.touch .kb-only, #app:not(.touch) .touch-only { display: none !important; }
 
 /* ---------- HUD ---------- */
 #hud { position: absolute; inset: 0; pointer-events: none; }
@@ -80,6 +90,66 @@ body { font-family: 'Elite', 'Courier New', monospace; -webkit-font-smoothing: a
 #cinematic .cl.voice.bad { color: #e05a4f; animation: shiver .09s infinite; }
 #cinematic .cl.count { font-family: 'Schoolbell', cursive; font-size: clamp(40px, 7vw, 90px); color: #cfc7b8; }
 
+/* ---------- Touch controls ---------- */
+/* Two joysticks and a few buttons, for tablets. Deliberately faint: they should feel like
+   something scratched into the glass, not a game UI, and light up only under a finger. */
+#touch { position: absolute; inset: 0; z-index: 5; pointer-events: none; touch-action: none; -webkit-touch-callout: none; }
+#touch .stick {
+  position: absolute; bottom: calc(var(--sb) + 1.5vmin); width: var(--zone); height: var(--zone);
+  display: grid; place-items: center; border-radius: 50%;
+  pointer-events: auto; touch-action: none; opacity: .55; transition: opacity .25s;
+}
+#touch .stick.left { left: calc(var(--sl) + 2vmin); }
+#touch .stick.right { right: calc(var(--sr) + 2vmin); }
+#touch .stick.held { opacity: 1; }
+#touch .base {
+  position: relative; width: var(--base); height: var(--base); border-radius: 50%;
+  border: 1px solid rgba(216, 210, 196, 0.3); background: radial-gradient(circle, rgba(216, 210, 196, 0.05), rgba(0, 0, 0, 0.4));
+}
+#touch .knob {
+  position: absolute; left: 50%; top: 50%; width: 42%; height: 42%; margin: -21% 0 0 -21%; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(232, 226, 212, 0.55), rgba(110, 104, 94, 0.35));
+  border: 1px solid rgba(216, 210, 196, 0.45); transition: transform .12s ease-out; will-change: transform;
+}
+#touch .stick.held .knob { transition: none; box-shadow: 0 0 14px rgba(155, 17, 17, 0.5); }
+/* the outer ring on the walk stick: drag past it to run */
+#touch .ring { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(216, 210, 196, 0.16); transition: border-color .15s, box-shadow .15s; }
+#touch .stick.run .ring { border-color: rgba(209, 29, 29, 0.8); box-shadow: 0 0 18px rgba(155, 17, 17, 0.5), inset 0 0 18px rgba(155, 17, 17, 0.3); }
+#touch .stick.run .knob { box-shadow: 0 0 18px rgba(209, 29, 29, 0.7); }
+#touch .cap { position: absolute; left: 0; right: 0; text-align: center; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-dim); pointer-events: none; }
+#touch .cap.top { top: 4%; }
+#touch .cap.bottom { bottom: 4%; }
+
+#touch .tbtn {
+  position: absolute; pointer-events: auto; touch-action: none; display: grid; place-items: center;
+  width: var(--btn); height: var(--btn); border-radius: 50%; padding: 0;
+  font-family: 'Elite', 'Courier New', monospace; font-size: 12px; letter-spacing: .14em; color: var(--ink);
+  background: rgba(8, 7, 6, 0.5); border: 1px solid rgba(216, 210, 196, 0.34); opacity: .6; cursor: pointer;
+  transition: opacity .15s, transform .08s, background .15s, border-color .15s;
+}
+#touch .tbtn.down, #touch .tbtn:active { opacity: 1; transform: scale(.93); background: rgba(60, 10, 10, 0.55); border-color: rgba(209, 29, 29, 0.7); }
+/* each button floats just above its thumb's stick */
+#touch .tb-light { left: calc(var(--sl) + 2vmin + (var(--zone) - var(--btn)) / 2); bottom: calc(var(--sb) + 2.5vmin + var(--zone)); }
+#touch .tb-use {
+  --big: calc(var(--btn) * 1.3); width: var(--big); height: var(--big); font-size: 14px; border-color: rgba(209, 29, 29, 0.4);
+  right: calc(var(--sr) + 2vmin + (var(--zone) - var(--big)) / 2); bottom: calc(var(--sb) + 2.5vmin + var(--zone));
+}
+#touch .tb-top { position: absolute; top: calc(var(--st) + 2vmin); right: calc(var(--sr) + 2vmin); display: flex; gap: 10px; }
+#touch .tbtn.mini { position: static; width: auto; height: 44px; padding: 0 16px; border-radius: 22px; font-size: 11px; }
+
+/* with the sticks on screen, the corner HUD moves out of their way */
+#app.touch #subtitles { width: min(900px, calc(100vw - 2 * (var(--zone) + 4vmin))); }
+#app.touch #toast { left: 50%; transform: translateX(-50%); bottom: max(10px, var(--sb)); max-width: calc(100vw - 2 * (var(--zone) + 6vmin)); text-align: center; }
+#app.touch #hint { right: calc(var(--sr) + 2vmin); bottom: auto; top: calc(var(--st) + 2vmin + 56px); max-width: 34vw; }
+
+#rotate { display: none; }
+@media (orientation: portrait) {
+  #app.touch #rotate {
+    display: block; position: absolute; z-index: 30; left: 0; right: 0; top: calc(var(--st) + 8px); text-align: center; pointer-events: none;
+    font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: var(--blood-bright); text-shadow: 0 0 6px #000;
+  }
+}
+
 /* ---------- Overlays ---------- */
 .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.72); z-index: 10; }
 .overlay-hint { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 13px; color: var(--ink-dim); letter-spacing: .12em; }
@@ -94,7 +164,7 @@ body { font-family: 'Elite', 'Courier New', monospace; -webkit-font-smoothing: a
     radial-gradient(ellipse at 70% 12%, rgba(60, 40, 20, .12) 0 10%, transparent 30%),
     linear-gradient(175deg, #ddd3ba 0%, #d4c8ab 55%, #c5b793 100%);
   box-shadow: 0 30px 80px rgba(0,0,0,.9), inset 0 0 60px rgba(90, 70, 30, .35);
-  transform: rotate(-1.2deg); scrollbar-width: thin;
+  transform: rotate(-1.2deg); scrollbar-width: thin; touch-action: pan-y;
 }
 #note .paper.typed { font-family: 'Elite', monospace; font-size: clamp(15px, 1.7vw, 18px); line-height: 1.55; }
 #note .paper.child { font-family: 'Schoolbell', cursive; }
@@ -109,7 +179,7 @@ body { font-family: 'Elite', 'Courier New', monospace; -webkit-font-smoothing: a
 #note .note-body li { margin-bottom: .45em; }
 #note .note-img img { display: block; width: 100%; height: auto; margin: 0 auto 12px; box-shadow: 0 2px 10px rgba(0,0,0,.35); }
 
-#journal .journal-inner { width: min(720px, 92vw); max-height: 84vh; overflow-y: auto; padding: 34px 40px 60px; background: var(--panel); border: 1px solid var(--hair); }
+#journal .journal-inner { width: min(720px, 92vw); max-height: 84vh; overflow-y: auto; touch-action: pan-y; padding: 34px 40px 60px; background: var(--panel); border: 1px solid var(--hair); }
 #journal h2, .menu h2 { font-family: 'Fell', serif; font-weight: 400; font-size: 34px; letter-spacing: .12em; margin: 0 0 18px; }
 .j-section { margin-bottom: 22px; }
 .j-label { font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 8px; }
@@ -120,7 +190,7 @@ body { font-family: 'Elite', 'Courier New', monospace; -webkit-font-smoothing: a
 #j-notes li.empty { cursor: default; color: var(--ink-faint); }
 
 .menu { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 260px; }
-.menu.wide { width: min(520px, 92vw); align-items: stretch; padding: 34px 38px; background: var(--panel); border: 1px solid var(--hair); }
+.menu.wide { width: min(520px, 92vw); max-height: 94vh; overflow-y: auto; touch-action: pan-y; align-items: stretch; padding: 34px 38px; background: var(--panel); border: 1px solid var(--hair); }
 .menu.wide h2 { text-align: center; }
 .menu button {
   font-family: 'Fell', serif; font-size: 24px; letter-spacing: .1em; color: var(--ink); background: none; border: none; padding: 6px 18px; cursor: pointer; position: relative;

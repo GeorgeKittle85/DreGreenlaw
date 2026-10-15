@@ -1,0 +1,63 @@
+# Builds COME HOME into its single self-contained index.html and publishes it to GitHub Pages.
+#
+#   push to main       build + deploy
+#   pull request       build only, so a broken build is caught before it merges
+#   manual             "Run workflow" in the Actions tab (from main) redeploys
+#
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The game is one file (JS, CSS and fonts inlined), so the site is just that file.
+      # It is rebuilt here from src/, so the deployed copy never depends on the committed index.html.
+      - run: npm run build
+
+      - name: Stage the site
+        run: |
+          mkdir _site
+          cp index.html _site/
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    # pull requests stop after the build above
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write # publish to Pages
+      id-token: write # prove to Pages that the deploy came from this workflow
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Per job, not per workflow: a pull request's build must never cancel a queued deploy.
+    # And a deploy already in flight finishes; no cancelling mid-route.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

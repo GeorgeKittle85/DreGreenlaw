@@ -13,7 +13,9 @@ You drive back to 57 Hollow Creek Road, the house you were sent away from twenty
 
 ## Play
 
-Open **`index.html`** in a recent desktop Chrome, Edge, Firefox or Safari. That's it — the whole game (engine, textures, sounds, fonts) is one self-contained file with no network access needed. Every texture is painted procedurally and every sound is synthesised at load time; there are no image or audio files.
+Open **`index.html`** in a recent Chrome, Edge, Firefox or Safari — on a desktop, or on a tablet such as an iPad. That's it — the whole game (engine, textures, sounds, fonts) is one self-contained file with no network access needed. Every texture is painted procedurally and every sound is synthesised at load time; there are no image or audio files.
+
+### Keyboard and mouse
 
 | Key | Action |
 | --- | --- |
@@ -25,7 +27,22 @@ Open **`index.html`** in a recent desktop Chrome, Edge, Firefox or Safari. That'
 | J | Journal (the Rules, notes, current objective) |
 | Esc | Pause / settings |
 
-Settings include mouse sensitivity, volume, brightness, a retro-pixel toggle and three quality levels. Progress is saved per chapter (Continue on the title screen).
+### Touch joysticks (iPad, tablets, phones)
+
+Two on-screen sticks, played landscape:
+
+| Control | Action |
+| --- | --- |
+| Left stick | Walk — a light push is a slow walk. Drag past the dashed outer ring to run (you tire quickly) |
+| Right stick | Look |
+| USE | Interact |
+| LIGHT | Flashlight |
+| JOURNAL | Journal (the Rules, notes, current objective) |
+| PAUSE | Pause / settings |
+
+The game picks touch controls by itself on devices whose main input is a finger. Either way you can switch at any time under **Settings → Controls** (from the title screen or the pause menu); the choice is remembered. Add the page to your iPad's Home Screen to hide the browser bars.
+
+Settings include the control scheme, look sensitivity, volume, brightness, a retro-pixel toggle and three quality levels. Progress is saved per chapter (Continue on the title screen).
 
 A first playthrough takes roughly 20–30 minutes. The test autopilot, which knows where everything is, finishes in about 8.
 
@@ -45,16 +62,30 @@ npm run build      # bundles src/ into the single-file index.html
 npm run watch      # rebuild on change
 ```
 
-Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/` (the house, yard, loop, basement), `audio/` (synth + mixer), `game/` (player, creature, story, chapters), `ui/`.
+Source lives in `src/`: `engine/` (renderer, input, physics, textures), `world/` (the house, yard, loop, basement), `audio/` (synth + mixer), `game/` (player, creature, story, chapters), `ui/` (menus and HUD; `touch.js` is the on-screen joystick layer, which writes into `Input.touch`).
 
-### Automated playthrough
+### Deploying to GitHub Pages
 
-`tests/playthrough.mjs` plays the entire game headlessly: an autopilot walks the real player controller through every route, aims at every object and presses E — including dying once in chapter IV and deliberately breaking Rules 3 and 4 before obeying them — and writes screenshots to `test-output/`.
+`.github/workflows/deploy.yml` builds the game and publishes it to GitHub Pages on every push to `main`, or on demand from the **Actions** tab. Pull requests only run the build, so a broken build is caught before it merges. The site is built from `src/` in CI, so the deployed game never depends on the committed `index.html` being up to date.
+
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**. After the first run the game lives at `https://<owner>.github.io/<repo>/` (the finished URL is also shown on the workflow run). Opening that link on an iPad is the easiest way to play it with the touch controls.
+
+### Automated tests
+
+Two Playwright suites run the built game in headless Chromium and write screenshots to `test-output/`.
+
+`tests/playthrough.mjs` plays the entire game headlessly: an autopilot walks the real player controller through every route, aims at every object and presses E — including dying once in chapter IV and deliberately breaking Rules 3 and 4 before obeying them.
+
+`tests/touch.mjs` drives the game as an iPad with real multi-touch events (both sticks, the run ring, every button, the Settings switch, notes, portrait) and then as a desktop, to prove the keyboard controls still behave.
 
 ```bash
-npm i -D playwright && npx playwright install chromium
-npm run build && npm test
+npm install && npx playwright install chromium   # once
+npm run build
+npm test               # full playthrough, about 3 minutes
+npm run test:touch     # touch controls + keyboard regression
 ```
+
+`.github/workflows/test.yml` runs both suites, in parallel, on every pull request and every push to `main`. If one fails, its screenshots are attached to the workflow run.
 
 Append `?chapter=hunt` (or `arrival`, `rules`, `hallway`, `well`, `after`) to the URL to jump to a chapter while developing.
 
